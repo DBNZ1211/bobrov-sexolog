@@ -21,7 +21,8 @@ fi
 docker compose up -d nginx website
 
 echo "Requesting Let's Encrypt certificate for $DOMAIN and www.$DOMAIN ..."
-docker compose run --rm certbot certonly \
+# Service entrypoint is /bin/sh (renew loop); override for one-shot issuance.
+docker compose run --rm --entrypoint certbot certbot certonly \
   --webroot \
   -w /var/www/certbot \
   -d "$DOMAIN" \
