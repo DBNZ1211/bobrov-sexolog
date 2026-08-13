@@ -1,0 +1,11 @@
+node_modules
+.nuxt
+.output
+.data
+.git
+design-mockups
+*.md
+.env
+data/*.db
+deploy/certbot/conf
+deploy/certbot/www
