@@ -122,6 +122,8 @@ onMounted(() => {
           <div data-hero class="hero-rule my-6 h-px w-24 bg-[var(--color-border)] md:my-7" />
 
           <p data-hero class="text-[0.95rem] font-medium text-[var(--color-navy-soft)] md:text-base">
+            Телемедицина
+            <span class="mx-2 text-[var(--color-navy)]/35">·</span>
             стаж {{ doctor.experienceYears }} {{ yearsLabel(doctor.experienceYears) }}
             <span class="mx-2 text-[var(--color-navy)]/35">·</span>
             от {{ doctor.priceFrom.toLocaleString('ru-RU') }} ₽
