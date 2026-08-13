@@ -47,18 +47,13 @@ docker compose up -d --build
 Первый SSL-сертификат (DNS A-запись уже на сервер):
 
 ```bash
+# подхватите DOMAIN/CERTBOT_EMAIL из .env
+set -a && . ./.env && set +a
 sh deploy/init-ssl.sh
 ```
 
-Затем замените HTTP-конфиг на TLS:
-
-```bash
-cp deploy/nginx/conf.d/bobrov-sexolog.ru.conf.tls.example deploy/nginx/conf.d/01-tls.conf
-rm deploy/nginx/conf.d/00-bootstrap.conf
-docker compose exec nginx nginx -s reload
-```
-
-Certbot в compose периодически делает `renew`.
+Скрипт выпустит сертификат, включит `01-tls.conf` и уберёт HTTP-bootstrap.  
+До этого nginx слушает только `:80` — без файлов Let's Encrypt он больше не падает.
 
 ## Контент
 

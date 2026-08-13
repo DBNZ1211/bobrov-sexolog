@@ -34,5 +34,6 @@ logs
 deploy/certbot/conf
 deploy/certbot/www
 !deploy/certbot/.gitkeep
+deploy/nginx/conf.d/01-tls.conf
 
 design-mockups/

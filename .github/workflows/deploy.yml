@@ -60,8 +60,16 @@ jobs:
           export DOCKER_BUILDKIT=1
           # Plain progress keeps SSH traffic alive during long nitro/fonts steps.
           docker compose -f docker-compose.yml build --progress=plain website
+
+          # If Let's Encrypt certs already exist, keep TLS enabled across git resets.
+          if [ -f deploy/certbot/conf/live/bobrov-sexolog.ru/fullchain.pem ]; then
+            cp deploy/nginx/conf.d/01-tls.conf.example deploy/nginx/conf.d/01-tls.conf
+            rm -f deploy/nginx/conf.d/00-bootstrap.conf
+          fi
+
           docker compose -f docker-compose.yml up -d --force-recreate website
           docker compose -f docker-compose.yml up -d nginx
+          docker compose -f docker-compose.yml exec -T nginx nginx -t
           docker compose -f docker-compose.yml exec -T nginx nginx -s reload || true
           docker image prune -f
           EOF
