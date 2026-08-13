@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches: [dev]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        env:
+          HOST: ${{ secrets.HOST }}
+          SSH_USER: ${{ secrets.USER }}
+          SSHPASS: ${{ secrets.PASSWORD }}
+          REPO: ${{ secrets.REPO_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${HOST:-}" ] || [ -z "${SSH_USER:-}" ] || [ -z "${SSHPASS:-}" ] || [ -z "${REPO:-}" ]; then
+            echo "Missing required secrets: HOST, USER, PASSWORD, REPO_URL"
+            exit 1
+          fi
+
+          sudo apt-get update
+          sudo apt-get install -y sshpass
+
+          # Secrets are expanded on the runner; remote script is then executed via bash -s.
+          REMOTE_SCRIPT=$(cat <<EOF
+          set -euo pipefail
+
+          if [ ! -d /root/bobrov-sexolog/.git ]; then
+            git clone "${REPO}" /root/bobrov-sexolog
+          fi
+
+          cd /root/bobrov-sexolog
+          git fetch origin dev
+          git checkout -B dev origin/dev
+          git reset --hard origin/dev
+
+          if [ ! -f .env ]; then
+            echo ".env is missing on the server. Create it once from .env.example before deploy."
+            exit 1
+          fi
+
+          docker compose -f docker-compose.yml build website
+          docker compose -f docker-compose.yml up -d --force-recreate website
+          docker compose -f docker-compose.yml up -d nginx
+          docker compose -f docker-compose.yml exec -T nginx nginx -s reload || true
+          docker image prune -f
+          EOF
+          )
+
+          sshpass -e \
+            ssh -o StrictHostKeyChecking=accept-new \
+            "${SSH_USER}@${HOST}" \
+            "bash -s" <<< "$REMOTE_SCRIPT"
