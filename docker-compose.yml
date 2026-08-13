@@ -9,7 +9,13 @@ services:
       PORT: 3000
       DATA_DIR: /app/data
       NODE_OPTIONS: --experimental-sqlite
-      NUXT_PUBLIC_SITE_URL: https://${DOMAIN:-bobrov-sexolog.ru}
+      # Nuxt runtimeConfig reads NUXT_* at runtime (ADMIN_* alone is not enough after build)
+      NUXT_ADMIN_USER: ${ADMIN_USER:-admin}
+      NUXT_ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      NUXT_SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      NUXT_DATA_DIR: /app/data
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-https://bobrov-sexolog.ru}
+      NUXT_OG_IMAGE_SECRET: ${NUXT_OG_IMAGE_SECRET:-}
     volumes:
       - ./data:/app/data
     networks:

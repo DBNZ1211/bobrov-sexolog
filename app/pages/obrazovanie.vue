@@ -2,9 +2,16 @@
 const { doctor } = useDoctor()
 const { docsFor } = useDocuments()
 
-useSeoMeta({
-  title: computed(() => `Образование — ${doctor.value.shortName}`),
-  description: 'Образование и повышение квалификации врача-уролога Боброва В. Т.',
+usePageSeo({
+  title: 'Образование',
+  description: computed(() => {
+    const edu = doctor.value.education[0]
+    const qual = doctor.value.qualifications[0]
+    const parts = ['Базовое образование, интернатура и повышение квалификации']
+    if (edu) parts.push(`${edu.title} (${edu.year})`)
+    if (qual) parts.push(`${qual.title} (${qual.year})`)
+    return `${parts.join('. ')}.`
+  }),
 })
 </script>
 
@@ -17,16 +24,14 @@ useSeoMeta({
     <section class="section bg-white">
       <div class="container-page">
         <div class="mx-auto max-w-3xl">
-          <div class="mb-5 flex items-center gap-3">
-            <span class="icon-badge icon-badge--lg" aria-hidden="true">
-              <Icon name="lucide:graduation-cap" />
-            </span>
-            <h2 class="font-serif text-2xl font-bold text-[var(--color-navy)]">
-              ВУЗ и интернатура
-            </h2>
-          </div>
+          <ul class="timeline">
+            <li class="timeline__item timeline__item--heading">
+              <span class="icon-badge icon-badge--lg timeline__badge" aria-hidden="true">
+                <Icon name="lucide:graduation-cap" />
+              </span>
+              <h2 class="timeline__heading">ВУЗ и интернатура</h2>
+            </li>
 
-          <ul class="timeline mb-12">
             <li
               v-for="item in doctor.education"
               :key="item.id"
@@ -67,18 +72,14 @@ useSeoMeta({
                 </div>
               </article>
             </li>
-          </ul>
 
-          <div class="mb-5 flex items-center gap-3">
-            <span class="icon-badge icon-badge--lg" aria-hidden="true">
-              <Icon name="lucide:badge-check" />
-            </span>
-            <h2 class="font-serif text-2xl font-bold text-[var(--color-navy)]">
-              Повышение квалификации
-            </h2>
-          </div>
+            <li class="timeline__item timeline__item--heading">
+              <span class="icon-badge icon-badge--lg timeline__badge" aria-hidden="true">
+                <Icon name="lucide:badge-check" />
+              </span>
+              <h2 class="timeline__heading">Повышение квалификации</h2>
+            </li>
 
-          <ul class="timeline">
             <li
               v-for="item in doctor.qualifications"
               :key="item.id"

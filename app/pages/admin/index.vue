@@ -4,7 +4,7 @@ definePageMeta({
   pageTransition: false,
 })
 
-useSeoMeta({ title: 'Заявки — админка' })
+useSeoMeta({ title: 'Заявки — админка', robots: 'noindex, nofollow' })
 
 interface Lead {
   id: number

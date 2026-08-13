@@ -1,11 +1,15 @@
 <script setup lang="ts">
 const { doctor } = useDoctor()
 
-useSeoMeta({
-  title: computed(() => `Клиники — ${doctor.value.shortName}`),
-  description: computed(() =>
-    `Места приёма: ${doctor.value.clinics.map((c) => c.name).join(', ')}`,
-  ),
+usePageSeo({
+  title: 'Клиники и контакты',
+  breadcrumb: 'Клиники',
+  description: computed(() => {
+    const places = doctor.value.clinics
+      .map((c) => c.address.split(',')[0]?.trim() || c.name)
+      .filter(Boolean)
+    return `Адреса и телефоны мест приёма: ${doctor.value.clinics.map((c) => c.name).join(', ')}. Города: ${places.join(', ')}.`
+  }),
 })
 </script>
 

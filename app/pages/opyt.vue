@@ -3,11 +3,13 @@ import { yearsLabel } from '~/utils/yearsLabel'
 
 const { doctor } = useDoctor()
 
-useSeoMeta({
-  title: computed(() => `Опыт работы — ${doctor.value.shortName}`),
+usePageSeo({
+  title: 'Опыт работы',
+  breadcrumb: 'Опыт',
   description: computed(() => {
     const first = doctor.value.experience[0]
-    return `Стаж ${doctor.value.experienceYears} ${yearsLabel(doctor.value.experienceYears)}. ${first?.place || ''}.`
+    const place = first ? `${first.place}, ${first.city}` : ''
+    return `Стаж ${doctor.value.experienceYears} ${yearsLabel(doctor.value.experienceYears)}. ${place}. Врач-уролог.`
   }),
 })
 </script>

@@ -4,7 +4,7 @@ definePageMeta({
   pageTransition: false,
 })
 
-useSeoMeta({ title: 'Вход в админку' })
+useSeoMeta({ title: 'Вход в админку', robots: 'noindex, nofollow' })
 
 const username = ref('')
 const password = ref('')

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 const { doctor } = useDoctor()
 
-useSeoMeta({
+usePageSeo({
+  home: true,
   title: computed(() => `${doctor.value.fullName} — ${doctor.value.title}, ${doctor.value.city}`),
-  description: computed(() => doctor.value.about),
+  description: homeDescription(),
   ogTitle: computed(() => `${doctor.value.fullName} — ${doctor.value.title}`),
-  ogDescription: computed(() => doctor.value.about),
-  ogType: 'website',
 })
 </script>
 

@@ -29,9 +29,10 @@ pnpm dev
 
 | Переменная | Назначение |
 |---|---|
-| `ADMIN_USER` / `ADMIN_PASSWORD` | доступ в админку |
-| `SESSION_SECRET` | подпись cookie-сессии |
+| `ADMIN_USER` / `ADMIN_PASSWORD` | доступ в админку (в Docker пробрасываются как `NUXT_ADMIN_*`) |
+| `SESSION_SECRET` | подпись cookie-сессии (в Docker — `NUXT_SESSION_SECRET`) |
 | `DATA_DIR` | каталог SQLite и загрузок (по умолчанию `./data`) |
+| `NUXT_PUBLIC_SITE_URL` | канонический URL (sitemap, OG, JSON-LD) |
 | `NUXT_PUBLIC_PHONE` | телефон на сайте |
 | `DOMAIN` / `CERTBOT_EMAIL` | для Docker / Let's Encrypt |
 

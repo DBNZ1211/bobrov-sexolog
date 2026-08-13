@@ -6,7 +6,7 @@ definePageMeta({
   pageTransition: false,
 })
 
-useSeoMeta({ title: 'Документы — админка' })
+useSeoMeta({ title: 'Документы — админка', robots: 'noindex, nofollow' })
 
 const { data: me, error: meError } = await useFetch('/api/auth/me')
 if (meError.value || !me.value?.authenticated) {

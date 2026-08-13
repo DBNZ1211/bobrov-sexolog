@@ -1,9 +1,15 @@
 <script setup lang="ts">
 const { doctor } = useDoctor()
 
-useSeoMeta({
-  title: computed(() => `С чем поможет — ${doctor.value.shortName}`),
-  description: computed(() => doctor.value.helpIntro),
+usePageSeo({
+  title: 'С чем поможет',
+  breadcrumb: 'Помощь',
+  description: computed(() => {
+    const extra = doctor.value.manipulations.slice(0, 3).join(', ')
+    return extra
+      ? `${doctor.value.helpIntro} В том числе: ${extra}.`
+      : doctor.value.helpIntro
+  }),
 })
 </script>
 

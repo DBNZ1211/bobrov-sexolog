@@ -1,9 +1,16 @@
 <script setup lang="ts">
 const { doctor } = useDoctor()
 
-useSeoMeta({
-  title: computed(() => `Запись на приём — ${doctor.value.shortName}`),
-  description: 'Оставьте заявку на приём или позвоните по телефону.',
+const config = useRuntimeConfig()
+const phone = computed(() => config.public.phone || doctor.value.phone)
+
+usePageSeo({
+  title: 'Запись на приём',
+  breadcrumb: 'Запись',
+  description: computed(
+    () =>
+      `Запись на приём к ${doctor.value.shortName}. Оставьте заявку на сайте или позвоните ${phone.value} — согласуем удобное время.`,
+  ),
 })
 </script>
 

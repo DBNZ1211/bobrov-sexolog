@@ -2,9 +2,12 @@
 const { doctor } = useDoctor()
 const { documents, pending } = useDocuments()
 
-useSeoMeta({
-  title: computed(() => `Документы — ${doctor.value.shortName}`),
-  description: 'Дипломы, сертификаты и документы врача-уролога Боброва В. Т.',
+usePageSeo({
+  title: 'Документы',
+  description: computed(
+    () =>
+      `Дипломы, сертификаты и подтверждающие документы ${doctor.value.fullName}, ${doctor.value.title.toLowerCase()}.`,
+  ),
 })
 </script>
 
