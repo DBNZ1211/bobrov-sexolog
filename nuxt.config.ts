@@ -109,7 +109,13 @@ export default defineNuxtConfig({
       },
     },
     rollupConfig: {
-      external: ['node:sqlite'],
+      external: [
+        'node:sqlite',
+        '@napi-rs/canvas',
+        'unpdf',
+        'pdfjs-dist',
+        'pdfjs-dist/legacy/build/pdf.mjs',
+      ],
     },
   },
 

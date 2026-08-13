@@ -5,15 +5,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'id обязателен' })
   }
 
-  const body = await readBody<{
-    title?: string
-    link_type?: string | null
-    link_id?: string | null
-    published?: boolean
-    sort_order?: number
-  }>(event)
-
-  const updated = updateDocument(id, body || {})
+  const updated = await regenerateDocumentPreview(id)
   if (!updated) {
     throw createError({ statusCode: 404, statusMessage: 'Документ не найден' })
   }

@@ -52,12 +52,15 @@ usePageSeo({
                   v-if="docsFor('education', item.id).length"
                   class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
                 >
-                  <a
+                  <component
+                    :is="doc.allow_open ? 'a' : 'div'"
                     v-for="doc in docsFor('education', item.id)"
                     :key="doc.id"
-                    :href="doc.file_url"
-                    target="_blank"
-                    rel="noopener"
+                    v-bind="
+                      doc.allow_open
+                        ? { href: doc.file_url, target: '_blank', rel: 'noopener' }
+                        : {}
+                    "
                     class="overflow-hidden rounded-lg border border-[var(--color-border)] bg-white"
                   >
                     <img
@@ -68,7 +71,7 @@ usePageSeo({
                       loading="lazy"
                     >
                     <p class="truncate px-2 py-1.5 text-xs text-[var(--color-muted)]">{{ doc.title }}</p>
-                  </a>
+                  </component>
                 </div>
               </article>
             </li>
@@ -100,12 +103,15 @@ usePageSeo({
                   v-if="docsFor('qualification', item.id).length"
                   class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
                 >
-                  <a
+                  <component
+                    :is="doc.allow_open ? 'a' : 'div'"
                     v-for="doc in docsFor('qualification', item.id)"
                     :key="doc.id"
-                    :href="doc.file_url"
-                    target="_blank"
-                    rel="noopener"
+                    v-bind="
+                      doc.allow_open
+                        ? { href: doc.file_url, target: '_blank', rel: 'noopener' }
+                        : {}
+                    "
                     class="overflow-hidden rounded-lg border border-[var(--color-border)] bg-white"
                   >
                     <img
@@ -116,7 +122,7 @@ usePageSeo({
                       loading="lazy"
                     >
                     <p class="truncate px-2 py-1.5 text-xs text-[var(--color-muted)]">{{ doc.title }}</p>
-                  </a>
+                  </component>
                 </div>
               </article>
             </li>

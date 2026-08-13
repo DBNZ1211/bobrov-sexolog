@@ -30,11 +30,15 @@ usePageSeo({
 
         <ul v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <li v-for="doc in documents" :key="doc.id" v-reveal>
-            <a
-              :href="doc.file_url"
-              target="_blank"
-              rel="noopener"
-              class="surface-card group block overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] transition hover:border-[var(--color-blue)]"
+            <component
+              :is="doc.allow_open ? 'a' : 'div'"
+              v-bind="
+                doc.allow_open
+                  ? { href: doc.file_url, target: '_blank', rel: 'noopener' }
+                  : {}
+              "
+              class="surface-card group block overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] transition"
+              :class="doc.allow_open ? 'hover:border-[var(--color-blue)]' : ''"
             >
               <div class="bg-white">
                 <img
@@ -52,14 +56,19 @@ usePageSeo({
                 </div>
               </div>
               <div class="p-4">
-                <p class="font-semibold text-[var(--color-navy)] group-hover:text-[var(--color-blue)]">
+                <p
+                  class="font-semibold text-[var(--color-navy)]"
+                  :class="doc.allow_open ? 'group-hover:text-[var(--color-blue)]' : ''"
+                >
                   {{ doc.title }}
                 </p>
                 <p class="mt-1 text-xs text-[var(--color-muted)]">
-                  {{ doc.ext.toUpperCase() }} · открыть оригинал
+                  {{ doc.ext.toUpperCase() }}
+                  <template v-if="doc.allow_open"> · открыть оригинал</template>
+                  <template v-else> · только превью</template>
                 </p>
               </div>
-            </a>
+            </component>
           </li>
         </ul>
       </div>

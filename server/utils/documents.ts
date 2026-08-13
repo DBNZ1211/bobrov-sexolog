@@ -33,6 +33,7 @@ type DocumentRow = {
   link_type: string
   link_id: string | null
   published: number
+  allow_open: number
   sort_order: number
   created_at: string
 }
@@ -50,6 +51,7 @@ function toPublic(row: DocumentRow): SiteDocument {
     link_type: (row.link_type as DocumentLinkType) || 'none',
     link_id: row.link_id,
     published: Boolean(row.published),
+    allow_open: row.allow_open === undefined || row.allow_open === null ? true : Boolean(row.allow_open),
     sort_order: Number(row.sort_order),
     created_at: row.created_at,
     file_url: `/api/media/uploads/${row.id}`,
@@ -117,6 +119,7 @@ export async function createDocument(input: {
   link_type?: string | null
   link_id?: string | null
   published?: boolean
+  allow_open?: boolean
 }): Promise<SiteDocument> {
   if (input.data.length > MAX_BYTES) {
     throw createError({ statusCode: 400, statusMessage: 'Файл больше 20 МБ' })
@@ -161,8 +164,8 @@ export async function createDocument(input: {
     .prepare(
       `INSERT INTO documents (
         id, title, original_name, mime, ext, size, file_path, preview_path,
-        link_type, link_id, published, sort_order, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        link_type, link_id, published, allow_open, sort_order, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       id,
@@ -176,6 +179,7 @@ export async function createDocument(input: {
       link.link_type,
       link.link_id,
       input.published === false ? 0 : 1,
+      input.allow_open === false ? 0 : 1,
       Number(maxSort.m) + 1,
       createdAt,
     )
@@ -190,6 +194,7 @@ export function updateDocument(
     link_type?: string | null
     link_id?: string | null
     published?: boolean
+    allow_open?: boolean
     sort_order?: number
   },
 ): SiteDocument | null {
@@ -212,6 +217,7 @@ export function updateDocument(
         link_type = ?,
         link_id = ?,
         published = ?,
+        allow_open = ?,
         sort_order = ?
        WHERE id = ?`,
     )
@@ -220,10 +226,31 @@ export function updateDocument(
       link.link_type,
       link.link_id,
       patch.published !== undefined ? (patch.published ? 1 : 0) : existing.published ? 1 : 0,
+      patch.allow_open !== undefined ? (patch.allow_open ? 1 : 0) : existing.allow_open ? 1 : 0,
       patch.sort_order !== undefined ? Number(patch.sort_order) : existing.sort_order,
       id,
     )
 
+  return getDocument(id)
+}
+
+export async function regenerateDocumentPreview(id: string): Promise<SiteDocument | null> {
+  const existing = getDocument(id)
+  if (!existing) return null
+
+  const sourcePath = join(getUploadsDir(), basename(existing.file_path))
+  if (!existsSync(sourcePath)) {
+    throw createError({ statusCode: 404, statusMessage: 'Файл не найден' })
+  }
+
+  const previewName = await generatePreview({
+    id,
+    sourcePath,
+    ext: `.${existing.ext}`,
+  })
+
+  const database = getDb()
+  database.prepare(`UPDATE documents SET preview_path = ? WHERE id = ?`).run(previewName, id)
   return getDocument(id)
 }
 

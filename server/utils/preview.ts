@@ -1,5 +1,13 @@
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import sharp from 'sharp'
@@ -8,12 +16,28 @@ import { getPreviewsDir } from './db'
 const RASTER_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp'])
 const OFFICE_EXTS = new Set(['.doc', '.docx', '.odt'])
 
+let pdfjsConfigured = false
+
 function which(cmd: string): string | null {
   const finder = process.platform === 'win32' ? 'where' : 'which'
   const result = spawnSync(finder, [cmd], { encoding: 'utf8' })
   if (result.status !== 0) return null
   const line = (result.stdout || '').split(/\r?\n/).map((s) => s.trim()).find(Boolean)
   return line || null
+}
+
+function findPdftoppm(): string | null {
+  const fromPath = which('pdftoppm')
+  if (fromPath) return fromPath
+  if (process.platform !== 'win32') return null
+  return (
+    [
+      'C:\\Program Files\\poppler\\Library\\bin\\pdftoppm.exe',
+      'C:\\Program Files\\poppler\\bin\\pdftoppm.exe',
+      'C:\\poppler\\Library\\bin\\pdftoppm.exe',
+      'C:\\poppler\\bin\\pdftoppm.exe',
+    ].find((p) => existsSync(p)) || null
+  )
 }
 
 async function writePlaceholder(outPath: string, label: string) {
@@ -36,15 +60,79 @@ async function rasterToPreview(sourcePath: string, outPath: string) {
     .toFile(outPath)
 }
 
-function pdfToPng(pdfPath: string, outPathWithoutExt: string): boolean {
-  const pdftoppm = which('pdftoppm')
-  if (!pdftoppm) return false
+async function shrinkPng(sourcePath: string, outPath: string) {
+  const tmp = `${outPath}.tmp`
+  await sharp(sourcePath)
+    .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+    .png()
+    .toFile(tmp)
+  copyFileSync(tmp, outPath)
+  try {
+    rmSync(tmp)
+  } catch {
+    /* ignore */
+  }
+}
+
+function pdfToPngWithPoppler(pdfPath: string, outPathWithoutExt: string): boolean {
+  const bin = findPdftoppm()
+  if (!bin) return false
   const result = spawnSync(
-    pdftoppm,
+    bin,
     ['-png', '-f', '1', '-singlefile', '-r', '144', pdfPath, outPathWithoutExt],
     { encoding: 'utf8' },
   )
   return result.status === 0 && existsSync(`${outPathWithoutExt}.png`)
+}
+
+async function ensurePdfjsConfigured() {
+  if (pdfjsConfigured) return
+  const { definePDFJSModule } = await import('unpdf')
+  await definePDFJSModule(() => import('pdfjs-dist/legacy/build/pdf.mjs'))
+  pdfjsConfigured = true
+}
+
+/**
+ * Pure-JS PDF → PNG via pdf.js + @napi-rs/canvas (no system poppler required).
+ */
+async function pdfToPngWithPdfjs(pdfPath: string, outPath: string): Promise<boolean> {
+  try {
+    await ensurePdfjsConfigured()
+    const { renderPageAsImage } = await import('unpdf')
+    const bytes = new Uint8Array(readFileSync(pdfPath))
+    const result = await renderPageAsImage(bytes, 1, {
+      canvasImport: () => import('@napi-rs/canvas'),
+      scale: 2,
+    })
+    writeFileSync(outPath, Buffer.from(result))
+    return existsSync(outPath)
+  } catch (err) {
+    console.error('[preview] pdfjs render failed:', err)
+    return false
+  }
+}
+
+async function pdfToPreview(pdfPath: string, outPath: string, tmpBase: string): Promise<boolean> {
+  if (pdfToPngWithPoppler(pdfPath, tmpBase)) {
+    const generated = `${tmpBase}.png`
+    if (generated !== outPath) {
+      copyFileSync(generated, outPath)
+      try {
+        rmSync(generated)
+      } catch {
+        /* ignore */
+      }
+    }
+    await shrinkPng(outPath, outPath)
+    return true
+  }
+
+  if (await pdfToPngWithPdfjs(pdfPath, outPath)) {
+    await shrinkPng(outPath, outPath)
+    return true
+  }
+
+  return false
 }
 
 function officeToPdf(sourcePath: string, outDir: string): string | null {
@@ -74,8 +162,7 @@ function officeToPdf(sourcePath: string, outDir: string): string | null {
 }
 
 /**
- * Generates `{id}.png` in previews dir. Returns relative filename or null on hard failure
- * (caller may still store document without preview; we always try placeholder).
+ * Generates `{id}.png` in previews dir. Returns relative filename.
  */
 export async function generatePreview(input: {
   id: string
@@ -97,27 +184,7 @@ export async function generatePreview(input: {
 
     if (ext === '.pdf') {
       const tmpBase = join(previewsDir, `${input.id}-pdf`)
-      if (pdfToPng(input.sourcePath, tmpBase)) {
-        const generated = `${tmpBase}.png`
-        if (generated !== outPath) {
-          copyFileSync(generated, outPath)
-          try {
-            rmSync(generated)
-          } catch {
-            /* ignore */
-          }
-        }
-        // shrink
-        await sharp(outPath)
-          .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
-          .png()
-          .toFile(outPath + '.tmp')
-        copyFileSync(outPath + '.tmp', outPath)
-        try {
-          rmSync(outPath + '.tmp')
-        } catch {
-          /* ignore */
-        }
+      if (await pdfToPreview(input.sourcePath, outPath, tmpBase)) {
         return outName
       }
       await writePlaceholder(outPath, 'PDF')
@@ -131,11 +198,7 @@ export async function generatePreview(input: {
         const pdfPath = officeToPdf(input.sourcePath, workDir)
         if (pdfPath) {
           const tmpBase = join(workDir, 'page')
-          if (pdfToPng(pdfPath, tmpBase)) {
-            await sharp(`${tmpBase}.png`)
-              .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
-              .png()
-              .toFile(outPath)
+          if (await pdfToPreview(pdfPath, outPath, tmpBase)) {
             return outName
           }
         }
@@ -153,12 +216,12 @@ export async function generatePreview(input: {
 
     await writePlaceholder(outPath, 'FILE')
     return outName
-  } catch {
+  } catch (err) {
+    console.error('[preview] generatePreview failed:', err)
     try {
       await writePlaceholder(outPath, ext.replace('.', '').toUpperCase() || 'FILE')
       return outName
     } catch {
-      // last resort empty-ish png via sharp buffer
       const buf = await sharp({
         create: {
           width: 400,

@@ -80,13 +80,23 @@ export function getDb() {
       link_type TEXT NOT NULL DEFAULT 'none',
       link_id TEXT,
       published INTEGER NOT NULL DEFAULT 1,
+      allow_open INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL
     );
   `)
+  ensureDocumentsSchema(db)
   getUploadsDir()
   getPreviewsDir()
   return db
+}
+
+function ensureDocumentsSchema(database: DatabaseSync) {
+  const cols = database.prepare(`PRAGMA table_info(documents)`).all() as { name: string }[]
+  const names = new Set(cols.map((c) => c.name))
+  if (!names.has('allow_open')) {
+    database.exec(`ALTER TABLE documents ADD COLUMN allow_open INTEGER NOT NULL DEFAULT 1`)
+  }
 }
 
 export function createLead(input: {

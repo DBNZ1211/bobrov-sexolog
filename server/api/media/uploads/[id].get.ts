@@ -28,6 +28,9 @@ export default defineEventHandler((event) => {
   if (!doc.published && !session) {
     throw createError({ statusCode: 404, statusMessage: 'Не найдено' })
   }
+  if (!doc.allow_open && !session) {
+    throw createError({ statusCode: 403, statusMessage: 'Документ недоступен для просмотра' })
+  }
 
   const path = getDocumentFilePath(id, 'upload')
   if (!path) {

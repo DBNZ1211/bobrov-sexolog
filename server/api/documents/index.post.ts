@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
   let linkType: string | null = 'none'
   let linkId: string | null = null
   let published = true
+  let allowOpen = true
   let filePart: { data: Buffer; filename?: string; type?: string } | null = null
 
   for (const part of form) {
@@ -24,6 +25,9 @@ export default defineEventHandler(async (event) => {
     } else if (part.name === 'published') {
       const v = part.data.toString('utf8')
       published = v !== '0' && v !== 'false'
+    } else if (part.name === 'allow_open') {
+      const v = part.data.toString('utf8')
+      allowOpen = v !== '0' && v !== 'false'
     }
   }
 
@@ -39,6 +43,7 @@ export default defineEventHandler(async (event) => {
     link_type: linkType,
     link_id: linkId,
     published,
+    allow_open: allowOpen,
   })
 
   return { document: doc }

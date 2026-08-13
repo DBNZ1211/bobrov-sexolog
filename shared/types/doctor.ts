@@ -66,6 +66,8 @@ export interface SiteDocument {
   link_type: DocumentLinkType
   link_id: string | null
   published: boolean
+  /** When false, public users cannot open/download the original file */
+  allow_open: boolean
   sort_order: number
   created_at: string
   /** Public URLs for clients */
