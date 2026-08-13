@@ -47,6 +47,16 @@ jobs:
             exit 1
           fi
 
+          # Nuxt/Nitro build needs ~1.5–2G; small VPS often OOM (exit 137) without swap.
+          if ! swapon --show | grep -q .; then
+            echo "No swap detected — creating 2G /swapfile for Docker build..."
+            fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048
+            chmod 600 /swapfile
+            mkswap /swapfile
+            swapon /swapfile
+          fi
+          free -h || true
+
           export DOCKER_BUILDKIT=1
           # Plain progress keeps SSH traffic alive during long nitro/fonts steps.
           docker compose -f docker-compose.yml build --progress=plain website

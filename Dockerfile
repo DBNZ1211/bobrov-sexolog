@@ -13,6 +13,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
 ENV NITRO_PRESET=node-server
+ENV NUXT_TELEMETRY_DISABLED=1
+# Cap V8 heap so GC runs earlier on small VPS (exit 137 = OOM kill).
+ENV NODE_OPTIONS=--max-old-space-size=768
+ENV UV_THREADPOOL_SIZE=2
 RUN pnpm build
 
 FROM node:24-bookworm-slim AS runner

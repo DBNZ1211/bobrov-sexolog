@@ -102,6 +102,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    sourceMap: false,
     esbuild: {
       options: {
         target: 'node22',
@@ -109,6 +110,14 @@ export default defineNuxtConfig({
     },
     rollupConfig: {
       external: ['node:sqlite'],
+    },
+  },
+
+  vite: {
+    build: {
+      sourcemap: false,
+      reportCompressedSize: false,
+      minify: 'esbuild',
     },
   },
 })
