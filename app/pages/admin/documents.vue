@@ -26,10 +26,11 @@ const { data: profile } = await useFetch<DoctorProfile>('/api/profile', {
 })
 
 const title = ref('')
-const linkType = ref<'none' | 'education' | 'qualification'>('none')
+const linkType = ref('none')
 const linkId = ref('')
 const published = ref(true)
 const file = ref<File | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
 const uploading = ref(false)
 const message = ref('')
 const error = ref('')
@@ -50,6 +51,17 @@ const linkOptions = computed(() => {
   }
   return []
 })
+
+const linkTypeOptions = [
+  { value: 'none', label: 'Без привязки' },
+  { value: 'education', label: 'Образование' },
+  { value: 'qualification', label: 'Повышение квалификации' },
+]
+
+const linkRecordOptions = computed(() => [
+  { value: '', label: 'Не выбрано' },
+  ...linkOptions.value.map((opt) => ({ value: opt.id, label: opt.label })),
+])
 
 watch(linkType, () => {
   linkId.value = ''
@@ -85,6 +97,7 @@ async function upload() {
     linkId.value = ''
     published.value = true
     file.value = null
+    if (fileInput.value) fileInput.value.value = ''
     message.value = 'Документ загружен'
     await refresh()
   } catch (e: unknown) {
@@ -133,43 +146,53 @@ function linkLabel(doc: SiteDocument) {
 
     <section class="mt-6 rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
       <h2 class="mb-4 font-serif text-xl font-bold text-[var(--color-navy)]">Загрузить</h2>
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="md:col-span-2">
-          <label class="label-field">Файл</label>
-          <input
-            class="input-field"
-            type="file"
-            accept=".pdf,.doc,.docx,.odt,.png,.jpg,.jpeg,.webp"
-            @change="onFileChange"
-          >
-        </div>
+      <div class="grid gap-4">
         <div>
-          <label class="label-field">Название</label>
-          <input v-model="title" class="input-field" type="text">
+          <label class="label-field" for="doc-file">Файл</label>
+          <label class="file-field">
+            <input
+              id="doc-file"
+              ref="fileInput"
+              class="file-field__input"
+              type="file"
+              accept=".pdf,.doc,.docx,.odt,.png,.jpg,.jpeg,.webp"
+              @change="onFileChange"
+            >
+            <span class="file-field__btn">Выбрать файл</span>
+            <span class="file-field__name" :class="{ 'is-empty': !file }">
+              {{ file?.name || 'Файл не выбран' }}
+            </span>
+          </label>
         </div>
-        <div>
-          <label class="label-field">Публиковать</label>
-          <label class="mt-2 flex items-center gap-2 text-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div class="min-w-0 flex-1">
+            <label class="label-field" for="doc-title">Название</label>
+            <input id="doc-title" v-model="title" class="input-field" type="text">
+          </div>
+          <label class="check-field shrink-0 sm:pb-3">
             <input v-model="published" type="checkbox">
             Показывать на сайте
           </label>
         </div>
-        <div>
-          <label class="label-field">Привязка</label>
-          <select v-model="linkType" class="input-field">
-            <option value="none">Без привязки</option>
-            <option value="education">Образование</option>
-            <option value="qualification">Повышение квалификации</option>
-          </select>
-        </div>
-        <div v-if="linkType !== 'none'">
-          <label class="label-field">Запись</label>
-          <select v-model="linkId" class="input-field">
-            <option value="">Не выбрано</option>
-            <option v-for="opt in linkOptions" :key="opt.id" :value="opt.id">
-              {{ opt.label }}
-            </option>
-          </select>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <label class="label-field" for="doc-link-type">Привязка</label>
+            <AppSelect
+              id="doc-link-type"
+              v-model="linkType"
+              :options="linkTypeOptions"
+              placeholder="Без привязки"
+            />
+          </div>
+          <div v-if="linkType !== 'none'">
+            <label class="label-field" for="doc-link-id">Запись</label>
+            <AppSelect
+              id="doc-link-id"
+              v-model="linkId"
+              :options="linkRecordOptions"
+              placeholder="Не выбрано"
+            />
+          </div>
         </div>
       </div>
       <p v-if="message" class="mt-3 text-sm font-medium text-green-700">{{ message }}</p>
@@ -188,7 +211,7 @@ function linkLabel(doc: SiteDocument) {
 
     <div
       v-else-if="!docsData?.documents?.length"
-      class="mt-6 rounded-xl border border-[var(--color-border)] bg-white p-6 text-[var(--color-muted)]"
+      class="mt-6 rounded-xl border border-[var(--color-border)] bg-white px-5 py-4 text-sm text-[var(--color-muted)]"
     >
       Документов пока нет.
     </div>
@@ -228,7 +251,7 @@ function linkLabel(doc: SiteDocument) {
             {{ doc.ext.toUpperCase() }} · {{ Math.round(doc.size / 1024) }} КБ
           </p>
           <p class="text-xs text-[var(--color-muted)]">Привязка: {{ linkLabel(doc) }}</p>
-          <label class="flex items-center gap-2 text-sm">
+          <label class="check-field">
             <input
               type="checkbox"
               :checked="doc.published"

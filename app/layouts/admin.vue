@@ -26,7 +26,7 @@ function isActive(to: string, exact?: boolean) {
 
 <template>
   <div class="min-h-screen bg-[var(--color-bg)]">
-    <header class="border-b border-[var(--color-border)] bg-white">
+    <header class="sticky top-0 z-50 border-b border-[var(--color-border)] bg-white">
       <div class="container-page flex h-16 flex-wrap items-center justify-between gap-3">
         <nav class="flex flex-wrap items-center gap-1 sm:gap-3" aria-label="Админ-навигация">
           <NuxtLink

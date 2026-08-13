@@ -190,13 +190,10 @@ async function save() {
 
 <template>
   <main class="container-page py-8">
-    <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 class="font-serif text-2xl font-bold text-[var(--color-navy)]">Профиль врача</h1>
-        <p class="mt-1 text-sm text-[var(--color-muted)]">
-          Данные сайта: опыт, образование, клиники и остальное. Строки можно перетаскивать за ⠿.
-        </p>
-      </div>
+    <div
+      class="sticky top-16 z-40 flex h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]"
+    >
+      <h1 class="font-serif text-2xl font-bold text-[var(--color-navy)]">Профиль врача</h1>
       <button
         type="button"
         class="btn-primary"
@@ -206,15 +203,20 @@ async function save() {
         {{ saving ? 'Сохранение…' : 'Сохранить' }}
       </button>
     </div>
+    <p class="mb-6 mt-3 text-sm text-[var(--color-muted)]">
+      Данные сайта: опыт, образование, клиники и остальное. Строки можно перетаскивать за ⠿.
+    </p>
 
     <p v-if="pending && !form" class="text-[var(--color-muted)]">Загрузка…</p>
     <p v-if="message" class="mb-4 text-sm font-medium text-green-700">{{ message }}</p>
     <p v-if="error" class="mb-4 text-sm font-medium text-red-700" role="alert">{{ error }}</p>
 
     <form v-if="form" class="space-y-8" @submit.prevent="save">
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <h2 class="mb-4 font-serif text-xl font-bold text-[var(--color-navy)]">Основное</h2>
-        <div class="grid gap-4 md:grid-cols-2">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <h2 class="sticky top-[7.5rem] z-30 border-b border-[var(--color-border)] bg-white px-5 py-3 font-serif text-xl font-bold text-[var(--color-navy)] md:px-6">
+          Основное
+        </h2>
+        <div class="grid gap-4 p-5 pt-4 md:grid-cols-2 md:p-6 md:pt-4">
           <div>
             <label class="label-field">ФИО</label>
             <input v-model="form.fullName" class="input-field" type="text">
@@ -274,13 +276,14 @@ async function save() {
         </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Специальности</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.specialties, stringKeys.specialties)">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(_item, index) in form.specialties"
           :key="stringKeys.specialties[index]"
@@ -309,15 +312,17 @@ async function save() {
           </button>
         </div>
         <p v-if="!form.specialties.length" class="text-sm text-[var(--color-muted)]">Пока пусто — нажмите «Добавить».</p>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Манипуляции</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.manipulations, stringKeys.manipulations)">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(_item, index) in form.manipulations"
           :key="stringKeys.manipulations[index]"
@@ -346,15 +351,17 @@ async function save() {
           </button>
         </div>
         <p v-if="!form.manipulations.length" class="text-sm text-[var(--color-muted)]">Пока пусто — нажмите «Добавить».</p>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Операции</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.surgeries, stringKeys.surgeries)">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(_item, index) in form.surgeries"
           :key="stringKeys.surgeries[index]"
@@ -383,15 +390,17 @@ async function save() {
           </button>
         </div>
         <p v-if="!form.surgeries.length" class="text-sm text-[var(--color-muted)]">Пока пусто — нажмите «Добавить».</p>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Опыт</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addExperience">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(item, index) in form.experience"
           :key="item.id"
@@ -436,15 +445,17 @@ async function save() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Образование</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addEducation">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(item, index) in form.education"
           :key="item.id"
@@ -485,15 +496,17 @@ async function save() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Повышение квалификации</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addQualification">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(item, index) in form.qualifications"
           :key="item.id"
@@ -534,15 +547,17 @@ async function save() {
             </button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section class="rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-3">
+      <section class="rounded-xl border border-[var(--color-border)] bg-white">
+        <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
           <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Клиники</h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addClinic">
             Добавить
           </button>
         </div>
+        <div class="p-5 pt-4 md:p-6 md:pt-4">
         <div
           v-for="(item, index) in form.clinics"
           :key="item.id"
@@ -586,6 +601,7 @@ async function save() {
               Удалить
             </button>
           </div>
+        </div>
         </div>
       </section>
 
