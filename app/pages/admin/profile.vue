@@ -193,13 +193,17 @@ async function save() {
     <div
       class="sticky top-16 z-40 flex h-14 items-center justify-between gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]"
     >
-      <h1 class="font-serif text-2xl font-bold text-[var(--color-navy)]">Профиль врача</h1>
+      <h1 class="inline-flex items-center gap-2.5 font-serif text-2xl font-bold text-[var(--color-navy)]">
+        <Icon name="lucide:user-round" class="h-6 w-6 shrink-0" aria-hidden="true" />
+        Профиль врача
+      </h1>
       <button
         type="button"
         class="btn-primary"
         :disabled="saving || pending || !form"
         @click="save"
       >
+        <Icon name="lucide:save" class="h-4 w-4 shrink-0" aria-hidden="true" />
         {{ saving ? 'Сохранение…' : 'Сохранить' }}
       </button>
     </div>
@@ -213,7 +217,8 @@ async function save() {
 
     <form v-if="form" class="space-y-8" @submit.prevent="save">
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
-        <h2 class="sticky top-[7.5rem] z-30 border-b border-[var(--color-border)] bg-white px-5 py-3 font-serif text-xl font-bold text-[var(--color-navy)] md:px-6">
+        <h2 class="sticky top-[7.5rem] z-30 flex items-center gap-2 border-b border-[var(--color-border)] bg-white px-5 py-3 font-serif text-xl font-bold text-[var(--color-navy)] md:px-6">
+          <Icon name="lucide:id-card" class="h-5 w-5 shrink-0" aria-hidden="true" />
           Основное
         </h2>
         <div class="grid gap-4 p-5 pt-4 md:grid-cols-2 md:p-6 md:pt-4">
@@ -278,8 +283,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Специальности</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:stethoscope" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Специальности
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.specialties, stringKeys.specialties)">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -317,8 +326,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Манипуляции</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:hand" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Манипуляции
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.manipulations, stringKeys.manipulations)">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -356,8 +369,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Операции</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:scissors" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Операции
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addStringItem(form.surgeries, stringKeys.surgeries)">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -395,8 +412,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Опыт</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:briefcase" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Опыт
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addExperience">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -450,8 +471,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Образование</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:graduation-cap" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Образование
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addEducation">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -501,8 +526,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Повышение квалификации</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:badge-check" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Повышение квалификации
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addQualification">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -552,8 +581,12 @@ async function save() {
 
       <section class="rounded-xl border border-[var(--color-border)] bg-white">
         <div class="sticky top-[7.5rem] z-30 flex items-center justify-between gap-3 border-b border-[var(--color-border)] bg-white px-5 py-3 md:px-6">
-          <h2 class="font-serif text-xl font-bold text-[var(--color-navy)]">Клиники</h2>
+          <h2 class="inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+            <Icon name="lucide:building-2" class="h-5 w-5 shrink-0" aria-hidden="true" />
+            Клиники
+          </h2>
           <button type="button" class="btn-primary !px-3 !py-2 text-sm" @click="addClinic">
+            <Icon name="lucide:plus" class="h-4 w-4 shrink-0" aria-hidden="true" />
             Добавить
           </button>
         </div>
@@ -607,6 +640,7 @@ async function save() {
 
       <div class="flex justify-end">
         <button type="submit" class="btn-primary" :disabled="saving">
+          <Icon name="lucide:save" class="h-4 w-4 shrink-0" aria-hidden="true" />
           {{ saving ? 'Сохранение…' : 'Сохранить' }}
         </button>
       </div>

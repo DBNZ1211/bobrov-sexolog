@@ -50,7 +50,10 @@ function formatDate(iso: string) {
 
 <template>
   <main class="container-page py-8">
-    <h1 class="mb-6 font-serif text-2xl font-bold text-[var(--color-navy)]">Заявки</h1>
+    <h1 class="mb-6 inline-flex items-center gap-2.5 font-serif text-2xl font-bold text-[var(--color-navy)]">
+      <Icon name="lucide:clipboard-list" class="h-7 w-7 shrink-0" aria-hidden="true" />
+      Заявки
+    </h1>
 
     <p v-if="pending" class="text-[var(--color-muted)]">Загрузка…</p>
 
@@ -105,17 +108,19 @@ function formatDate(iso: string) {
               <button
                 v-if="lead.status === 'new'"
                 type="button"
-                class="text-sm font-semibold text-[var(--color-blue)] hover:underline"
+                class="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-blue)] hover:underline"
                 @click="setStatus(lead, 'done')"
               >
+                <Icon name="lucide:check" class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Отметить
               </button>
               <button
                 v-else
                 type="button"
-                class="text-sm font-semibold text-[var(--color-muted)] hover:underline"
+                class="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-muted)] hover:underline"
                 @click="setStatus(lead, 'new')"
               >
+                <Icon name="lucide:undo-2" class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Вернуть
               </button>
             </td>

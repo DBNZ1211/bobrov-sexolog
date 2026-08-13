@@ -266,14 +266,20 @@ function linkLabel(doc: SiteDocument) {
 
 <template>
   <main class="container-page py-8">
-    <h1 class="font-serif text-2xl font-bold text-[var(--color-navy)]">Документы</h1>
+    <h1 class="inline-flex items-center gap-2.5 font-serif text-2xl font-bold text-[var(--color-navy)]">
+      <Icon name="lucide:files" class="h-6 w-6 shrink-0" aria-hidden="true" />
+      Документы
+    </h1>
     <p class="mt-1 text-sm text-[var(--color-muted)]">
       PDF, DOCX, PNG и др. Превью строится автоматически (PNG). Если видите заглушку —
       нажмите «Обновить превью».
     </p>
 
     <section class="mt-6 rounded-xl border border-[var(--color-border)] bg-white p-5 md:p-6">
-      <h2 class="mb-4 font-serif text-xl font-bold text-[var(--color-navy)]">Загрузить</h2>
+      <h2 class="mb-4 inline-flex items-center gap-2 font-serif text-xl font-bold text-[var(--color-navy)]">
+        <Icon name="lucide:upload" class="h-5 w-5 shrink-0" aria-hidden="true" />
+        Загрузить
+      </h2>
       <div class="grid gap-4">
         <div>
           <label class="label-field" for="doc-file">Файл</label>
@@ -291,7 +297,10 @@ function linkLabel(doc: SiteDocument) {
               accept=".pdf,.doc,.docx,.odt,.png,.jpg,.jpeg,.webp"
               @change="onFileChange"
             >
-            <span class="file-field__btn">Выбрать файл</span>
+            <span class="file-field__btn">
+              <Icon name="lucide:folder-open" class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              Выбрать файл
+            </span>
             <span class="file-field__name" :class="{ 'is-empty': !file && !isWindowFileDrag }">
               {{
                 isWindowFileDrag
@@ -346,6 +355,12 @@ function linkLabel(doc: SiteDocument) {
         :disabled="uploading || !file"
         @click="upload"
       >
+        <Icon
+          :name="uploading ? 'lucide:loader-circle' : 'lucide:upload'"
+          class="h-4 w-4 shrink-0"
+          :class="{ 'animate-spin': uploading }"
+          aria-hidden="true"
+        />
         {{ uploading ? 'Загрузка…' : 'Загрузить' }}
       </button>
     </section>

@@ -41,7 +41,10 @@ async function login() {
       class="w-full max-w-md rounded-xl border border-[var(--color-border)] bg-white p-6 shadow-sm md:p-8"
       @submit.prevent="login"
     >
-      <h1 class="font-serif text-2xl font-bold text-[var(--color-navy)]">Админ-панель</h1>
+      <h1 class="inline-flex items-center gap-2.5 font-serif text-2xl font-bold text-[var(--color-navy)]">
+        <Icon name="lucide:shield-check" class="h-7 w-7 shrink-0" aria-hidden="true" />
+        Админ-панель
+      </h1>
       <p class="mt-2 text-sm text-[var(--color-muted)]">Вход по логину и паролю</p>
 
       <div class="mt-6 space-y-4">
@@ -72,10 +75,17 @@ async function login() {
       <p v-if="error" class="mt-4 text-sm font-medium text-red-700" role="alert">{{ error }}</p>
 
       <button type="submit" class="btn-primary mt-6 w-full" :disabled="pending">
+        <Icon name="lucide:log-in" class="h-4 w-4 shrink-0" aria-hidden="true" />
         {{ pending ? 'Вход…' : 'Войти' }}
       </button>
 
-      <a href="/" class="mt-4 inline-block text-sm text-[var(--color-blue)] hover:underline">На сайт</a>
+      <a
+        href="/"
+        class="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--color-blue)] hover:underline"
+      >
+        <Icon name="lucide:arrow-left" class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        На сайт
+      </a>
     </form>
   </div>
 </template>
