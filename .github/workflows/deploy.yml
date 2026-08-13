@@ -64,6 +64,9 @@ jobs:
           # Self-signed or existing LE certs so nginx can bind :443
           sh deploy/ensure-certs.sh
 
+          mkdir -p data/uploads data/previews
+          chmod -R u+rwX data || true
+
           docker compose -f docker-compose.yml up -d --force-recreate website
           docker compose -f docker-compose.yml up -d --force-recreate nginx
           docker compose -f docker-compose.yml exec -T nginx nginx -t

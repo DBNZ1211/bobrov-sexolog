@@ -18,7 +18,12 @@ let db: DatabaseSync | null = null
 export function getDataDir() {
   const config = useRuntimeConfig()
   const dir = String(config.dataDir || './data')
-  mkdirSync(dir, { recursive: true })
+  try {
+    mkdirSync(dir, { recursive: true })
+  } catch (err) {
+    console.error(`[db] cannot create data dir "${dir}":`, err)
+    throw err
+  }
   return dir
 }
 

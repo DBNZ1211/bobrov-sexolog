@@ -40,8 +40,11 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
 COPY --from=build /app/.output ./.output
-RUN mkdir -p /app/data && chown -R node:node /app/data /app/node_modules /app/.output
+COPY deploy/docker-entrypoint.sh /docker-entrypoint.sh
+RUN mkdir -p /app/data \
+  && chown -R node:node /app/data /app/node_modules /app/.output \
+  && chmod +x /docker-entrypoint.sh
 
-USER node
 EXPOSE 3000
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["node", ".output/server/index.mjs"]
