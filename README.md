@@ -44,16 +44,16 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Первый SSL-сертификат (DNS A-запись уже на сервер):
+Первый SSL (DNS A на сервер, открыты порты 80 и 443):
 
 ```bash
-# подхватите DOMAIN/CERTBOT_EMAIL из .env
 set -a && . ./.env && set +a
-sh deploy/init-ssl.sh
+sh deploy/ensure-certs.sh   # :443 сразу (self-signed, если LE ещё нет)
+docker compose up -d nginx website
+sh deploy/init-ssl.sh       # настоящий Let's Encrypt
 ```
 
-Скрипт выпустит сертификат, включит `01-tls.conf` и уберёт HTTP-bootstrap.  
-До этого nginx слушает только `:80` — без файлов Let's Encrypt он больше не падает.
+`ensure-certs.sh` нужен, чтобы nginx слушал **443** до выпуска LE. Certbot в compose потом делает `renew`.
 
 ## Контент
 
