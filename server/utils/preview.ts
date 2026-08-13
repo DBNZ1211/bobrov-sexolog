@@ -92,6 +92,20 @@ async function ensurePdfjsConfigured() {
   pdfjsConfigured = true
 }
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+      }),
+    ])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
+}
+
 /**
  * Pure-JS PDF → PNG via pdf.js + @napi-rs/canvas (no system poppler required).
  */
@@ -100,10 +114,15 @@ async function pdfToPngWithPdfjs(pdfPath: string, outPath: string): Promise<bool
     await ensurePdfjsConfigured()
     const { renderPageAsImage } = await import('unpdf')
     const bytes = new Uint8Array(readFileSync(pdfPath))
-    const result = await renderPageAsImage(bytes, 1, {
-      canvasImport: () => import('@napi-rs/canvas'),
-      scale: 2,
-    })
+    const result = await withTimeout(
+      renderPageAsImage(bytes, 1, {
+        canvasImport: () => import('@napi-rs/canvas'),
+        // Lower scale = less RAM/CPU on small VPS
+        scale: 1.25,
+      }),
+      60_000,
+      'pdfjs render',
+    )
     writeFileSync(outPath, Buffer.from(result))
     return existsSync(outPath)
   } catch (err) {

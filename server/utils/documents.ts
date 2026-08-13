@@ -141,17 +141,8 @@ export async function createDocument(input: {
   const absolutePath = join(uploadsDir, storedName)
   writeFileSync(absolutePath, input.data)
 
-  let previewRelative: string | null = null
-  try {
-    const previewName = await generatePreview({
-      id,
-      sourcePath: absolutePath,
-      ext,
-    })
-    previewRelative = previewName
-  } catch {
-    previewRelative = null
-  }
+  // Don't block the HTTP request on PDF/Office preview (can take minutes on a small VPS).
+  const previewRelative: string | null = null
 
   const link = normalizeLink(input.link_type, input.link_id)
   const createdAt = new Date().toISOString()
@@ -184,7 +175,13 @@ export async function createDocument(input: {
       createdAt,
     )
 
-  return getDocument(id)!
+  const doc = getDocument(id)!
+
+  void regenerateDocumentPreview(id).catch((err) => {
+    console.error(`[documents] background preview failed for ${id}:`, err)
+  })
+
+  return doc
 }
 
 export function updateDocument(

@@ -196,9 +196,14 @@ async function upload() {
     allowOpen.value = true
     file.value = null
     syncFileInput(null)
-    message.value = 'Документ загружен'
+    message.value = 'Документ загружен. Превью строится в фоне — обновите через пару секунд.'
     previewBust.value = Date.now()
     await refresh()
+    // Preview is generated in background; refresh again shortly
+    window.setTimeout(() => {
+      previewBust.value = Date.now()
+      void refresh()
+    }, 4000)
   } catch (e: unknown) {
     const err = e as { data?: { statusMessage?: string }; statusMessage?: string }
     error.value = err?.data?.statusMessage || err?.statusMessage || 'Ошибка загрузки'
