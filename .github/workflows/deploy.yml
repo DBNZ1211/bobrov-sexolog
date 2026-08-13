@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Deploy over SSH
         env:
@@ -46,7 +47,9 @@ jobs:
             exit 1
           fi
 
-          docker compose -f docker-compose.yml build website
+          export DOCKER_BUILDKIT=1
+          # Plain progress keeps SSH traffic alive during long nitro/fonts steps.
+          docker compose -f docker-compose.yml build --progress=plain website
           docker compose -f docker-compose.yml up -d --force-recreate website
           docker compose -f docker-compose.yml up -d nginx
           docker compose -f docker-compose.yml exec -T nginx nginx -s reload || true
@@ -54,8 +57,14 @@ jobs:
           EOF
           )
 
+          # Keepalive prevents NAT/firewall from dropping idle SSH mid-build
+          # (client_loop: send disconnect: Broken pipe).
           sshpass -e \
-            ssh -o StrictHostKeyChecking=accept-new \
+            ssh \
+            -o StrictHostKeyChecking=accept-new \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=120 \
+            -o TCPKeepAlive=yes \
             -p "$PORT" \
             "${SSH_USER}@${HOST}" \
             "bash -s" <<< "$REMOTE_SCRIPT"
